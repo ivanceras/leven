@@ -2,6 +2,7 @@ use chrono::{DateTime, Local};
 use error::{Error, Result};
 use pulldown_cmark;
 use pulldown_cmark::Parser;
+use spongedown;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rayon::slice::ParallelSliceMut;
 use rayon::scope;
@@ -74,6 +75,7 @@ context! {
 }
 
 impl Post {
+    #[cfg(not(feature="spongedown"))]
     fn new<P: AsRef<Path>>(path: P) -> Result<Post> {
         let path = path.as_ref();
 
@@ -83,6 +85,25 @@ impl Post {
         let mut content = String::new();
         let parser = Parser::new(&src);
         pulldown_cmark::html::push_html(&mut content, parser);
+
+        let title = path.file_stem()
+            .unwrap()
+            .to_string_lossy()
+            .into();
+
+        let date  = path.metadata()?.modified()?.into();
+        let slug  = slug::slugify(&title);
+
+        Ok(Post { content, title, date, slug })
+    }
+
+    #[cfg(feature="spongedown")]
+    fn new<P: AsRef<Path>>(path: P) -> Result<Post> {
+        let path = path.as_ref();
+
+        let mut src = String::new();
+        File::open(&path)?.read_to_string(&mut src)?;
+        let content = spongedown::parse(&src);
 
         let title = path.file_stem()
             .unwrap()

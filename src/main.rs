@@ -6,6 +6,8 @@ extern crate git2;
 #[macro_use]
 extern crate log;
 extern crate pulldown_cmark;
+#[cfg(feature="spongedown")]
+extern crate spongedown;
 extern crate rayon;
 extern crate slug;
 #[macro_use]

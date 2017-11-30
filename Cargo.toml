@@ -13,6 +13,7 @@ clap = "2.26"
 git2 = "0.6.8"
 log = "0.3"
 pulldown-cmark = "0.1"
+spongedown = { version = "0.2", optional = true }
 rayon = "0.9"
 serde = "1.0"
 slug = "0.1"
